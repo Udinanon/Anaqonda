@@ -22,5 +22,7 @@ def main():
             Alice.sendQubit(qbit, "Charlie")
         print("ALICE DONE")
         charlie_output = Alice.recvClassical()
+        print("ALICE X:"+str(x_vector))
+        print("ALICE H:"+str(h_vector))
 
 main()

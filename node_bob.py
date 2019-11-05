@@ -25,9 +25,12 @@ def main():
         for qbit in q_vector:
             Bob.sendQubit(qbit, "Charlie")
         print("BOB DONE")
-        charlie_output = Bob.recvClassical()
 
         #ricevo c_vector
+        charlie_output = Bob.recvClassical()
+        
+        print("BOB X:"+str(x_vector))
+        print("BOB H:"+str(h_vector))
         # !SERVER#se c[i][0]==0 lo scarto, se ==1 tengo
         # allora predno c[i][1] e prendo h_vector
         # h==0 flippo x[i], h==1 e c[i][1]==1 flippo, altrimenti lascio
