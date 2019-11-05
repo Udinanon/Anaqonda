@@ -15,4 +15,3 @@ with CQCConnection("Alice") as Alice:
 
     print(q_vector)
 
-    Alice.close()
