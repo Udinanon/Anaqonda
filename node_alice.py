@@ -8,14 +8,19 @@ def main():
 
 		q_vector = []
 		for i in range(10):
-			q_vector.append(qubit(Alice))
+			id_string = "100" + str(i)
+			q_vector.append(qubit(Alice, q_id=int(id_string)))
 
 		for i in range(10):
+			id_string = "100" + str(i)
 			if x_vector[i] == 1:
 				q_vector[i].X()
 			if h_vector == 1:
 				q_vector[i].H()
 
-		print(q_vector)
+		for qbit in q_vector:
+			Alice.sendQubit(qbit, "Charlie")
+		print("gjgk")
+		charlie_output = Alice.recvClassical()
 
 main()

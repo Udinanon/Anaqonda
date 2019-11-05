@@ -1,3 +1,5 @@
+# https://softwarequtech.github.io/SimulaQron/html/_modules/cqc/pythonLib.html#qubit
+
 from cqc.pythonLib import CQCConnection, qubit
 import json
 
@@ -8,12 +10,15 @@ def main():
 		qB=[]
 		
 		#ricevi array Alice, array Bob
-		for i in range(2*n):
-			qI=Bob.recvQubit()
-			if qI._qID.startswith("Alice"):
+		for i in range(2*10):
+			qI=Charlie.recvQubit()
+			# print(str(i) + str(qI))
+			print(str(qI._qID))
+			if str(qI._qID).startswith("100"):
 				qA.append(qI)
 			else:
 				qB.append(qI)
+		print(qB)
 		
 		#per ogni qubit fai cNOT , Alice.cNOT(BOB)
 		for i in range(len(qA)):

@@ -10,7 +10,8 @@ def main():
 		#array qubit
 		q_vector = []
 		for i in range(10):
-			q_vector.append(qubit(Bob))
+			id_string = "200" + str(i)
+			q_vector.append(qubit(Bob, q_id=int(id_string)))
 		#codifica valori in qubit
 		for i in range(10):
 			if x_vector[i] == 1:
@@ -18,7 +19,10 @@ def main():
 			if h_vector == 1:
 				q_vector[i].H()
 		#invia qubit
-		
+		for qbit in q_vector:
+			Bob.sendQubit(qbit, "Charlie")
+		print("vyhby")
+		charlie_output = Bob.recvClassical()
 
 		#ricevo c_vector
 		# !SERVER#se c[i][0]==0 lo scarto, se ==1 tengo
