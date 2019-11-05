@@ -20,15 +20,16 @@ def main():
         print(len(qA))
         print(len(qB))
         
-        #per ogni qubit fai cNOT , Alice.cNOT(BOB)
+        #For every received qubit do cNOT operation, i.e. Alice.cNOT(Bob)
         for i in range(len(qA)):
             qA[i].cnot(qB[i])
         
-        #Hadamard su array Alice
+        #Apply Hadamard transformation on Alice's array
         for i in range(len(qA)):
             qA[i].H()
-        #misura array Alice e Bob, Alice->vettore_successo, Bob->segno
-        #creo matrice risultati, [succ, segno]
+		
+		#Do the measurement on Alice and Bob arrays: Alice->success array, Bob->sign array
+        #create results matrix, [succ, sign]
         M_out=[]
         for i in range(len(qA)):
             a=qA[i].measure()
@@ -36,7 +37,8 @@ def main():
             print("A:"+str(a))
             print("B:"+str(b))
             M_out.append([a, b])
-        #invia matrice ad Alice e Bob
+			
+        #Send results matrix to Alice and Bob
         print("CHARLIE IS DONE")
         print("HERE IS OUTPUT MATRIX: "+str(M_out))
         msg = json.dumps(M_out).encode('utf-8')
