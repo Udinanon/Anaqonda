@@ -9,7 +9,7 @@ def main():
 		q_vector = []
 		for i in range(10):
 			id_string = "100" + str(i)
-			q_vector.append(qubit(Alice, q_id=int(id_string)))
+			q_vector.append(qubit(Alice))
 
 		for i in range(10):
 			id_string = "100" + str(i)
