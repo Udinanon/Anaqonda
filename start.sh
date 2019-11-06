@@ -1,3 +1,5 @@
-./cli/SimulaQron start --nodes Alice,Bob,Charlie
+simulaqron stop
+simulaqron set max-qubits 65536
+simulaqron start
 
-python node_alice.py && python node_bob.py && python node_charlie.py
+python3 node_charlie.py
