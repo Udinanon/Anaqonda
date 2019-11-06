@@ -3,7 +3,9 @@ import random
 import json
 import time
 
-N_QUBIT = 100
+N_QUBIT = 10
+with open("n_qubit.config") as config_file:
+    N_QUBIT = int(next(config_file).split()[0])
 
 with CQCConnection("Alice") as Alice:
     # Preparing my qubits
@@ -22,13 +24,13 @@ with CQCConnection("Alice") as Alice:
     
     # Ask to Charlie (the commutor node as chosen for the network architecture)
     # if I am the master, stating who I am
-    print("# Am I the master, stating who I am ?_?")
+    print("~Alice  # Am I the master, stating who I am (?_?)")
     Alice.sendClassical("Charlie", json.dumps( {"name": "Alice"} ).encode("utf-8"))
     charlie_attempt_response = Alice.recvClassical()
     im_master = json.loads(charlie_attempt_response.decode("utf-8"))
     
     # If Charlie responded than it's ready for receiving my qubits, I send them
-    print("# I'm sending the qubits to Charlie T_T")
+    print("~Alice  # I'm sending the qubits to Charlie (T_T)")
     for qubit in q_vector:
         Alice.sendQubit(qubit, "Charlie")
     
@@ -55,7 +57,6 @@ with CQCConnection("Alice") as Alice:
             if h_vector[i] == 1 and matrix[i][0] == 0:
                 continue
             x_vector[i] = 1 if x_vector[i] == 0 else 0
-
     else:
         # Remove errors
         for i in range(N_QUBIT):
@@ -73,9 +74,5 @@ with CQCConnection("Alice") as Alice:
             key.append(x_vector[i])
 
     # Print the key obtained
-    print(key)
-    print("Key length" + str(len(key)))
-
-    # TOremove
-    #Alice.sendClassical("Bob", json.dumps(x_vector).encode("utf-8"))
-
+    print("~Alice  # " + repr(key))
+    print("~Alice  # Key length: " + str(len(key)))

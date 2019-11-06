@@ -3,7 +3,9 @@ import random
 import json
 import time
 
-N_QUBIT = 100
+N_QUBIT = 10
+with open("n_qubit.config") as config_file:
+    N_QUBIT = int(next(config_file).split()[0])
 
 with CQCConnection("Bob") as Bob:
     # Preparing my qubits
@@ -22,13 +24,13 @@ with CQCConnection("Bob") as Bob:
     
     # Ask to Charlie (the commutor node as chosen for the network architecture)
     # if I am the master, stating who I am
-    print("# Am I the master, stating who I am ?_?")
+    print("~Bob    # Am I the master, stating who I am (?_?)")
     Bob.sendClassical("Charlie", json.dumps( {"name": "Bob"} ).encode("utf-8"))
     charlie_attempt_response = Bob.recvClassical()
     im_master = json.loads(charlie_attempt_response.decode("utf-8"))
     
     # If Charlie responded than it's ready for receiving my qubits, I send them
-    print("# I'm sending the qubits to Charlie T_T")
+    print("~Bob    # I'm sending the qubits to Charlie (T_T)")
     for qubit in q_vector:
         Bob.sendQubit(qubit, "Charlie")
     
@@ -72,15 +74,5 @@ with CQCConnection("Bob") as Bob:
             key.append(x_vector[i])
 
     # Print the key obtained
-    print(key)
-    print("Key length" + str(len(key)))
-
-    # TOremove
-    #xother_vector = json.loads(Bob.recvClassical().decode("utf-8"))
-
-    #error_counts = 0
-    #for i in range(N_QUBIT):
-    #    if x_vector[i] != xother_vector[i]:
-    #        error_counts += 1
-    #print("Errors = " + str(error_counts))
-
+    print("~Bob    # " + repr(key))
+    print("~Bob    # Key length: " + str(len(key)))
