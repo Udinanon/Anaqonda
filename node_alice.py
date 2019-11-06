@@ -76,3 +76,27 @@ with CQCConnection("Alice") as Alice:
     # Print the key obtained
     print("~Alice  # " + repr(key))
     print("~Alice  # Key length: " + str(len(key)))
+    
+    if not im_master:
+        simm_len=int(len(key)/3)
+        Alice.sendClassical("Bob", json.dumps(key[0:simm_len]).encode("utf-8"))
+        ans=json.loads(Alice.recvClassical().decode("utf-8"))
+        print(ans)
+        if ans=="CHARLIE EVIL":
+            print("~Alice  # ALICE IS DESTROYING THE KEY")
+            key=None
+    else:
+        simm_key=json.loads(Alice.recvClassical().decode("utf-8"))
+        simm_len=len(simm_key)
+        print("~Alice  # ARE SIMM_KEYS THE SAME? "+str(simm_key==key[0:simm_len]))
+        err=0
+        for i in range(simm_len):
+            if simm_key[i]!=key[i]:
+                err=err+1
+        print("~Alice  # QBER="+str(err/simm_len))
+        if simm_key==key[0:simm_len]:
+            Alice.sendClassical("Bob", json.dumps("CHARLIE GOOD").encode("utf-8"))
+        else:
+            Alice.sendClassical("Bob", json.dumps("CHARLIE EVIL").encode("utf-8"))
+            print("~Alice  # ALICE IS DESTROYING THE KEY")
+            key=None

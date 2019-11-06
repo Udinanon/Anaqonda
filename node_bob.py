@@ -76,3 +76,28 @@ with CQCConnection("Bob") as Bob:
     # Print the key obtained
     print("~Bob    # " + repr(key))
     print("~Bob    # Key length: " + str(len(key)))
+    
+    # key simmetrization
+    if not im_master:
+        simm_len=int(len(key)/3)
+        Bob.sendClassical("Alice", json.dumps(key[0:simm_len]).encode("utf-8"))
+        ans=json.loads(Bob.recvClassical().decode("utf-8"))
+        print(ans)
+        if ans=="CHARLIE EVIL":
+            print("~Bob    # BOB IS DESTROYING THE KEY")
+            key=None
+    else:
+        simm_key=json.loads(Bob.recvClassical().decode("utf-8"))
+        simm_len=len(simm_key)
+        print("~Bob    # ARE SIMM_KEYS THE SAME? "+str(simm_key==key[0:simm_len]))
+        err=0
+        for i in range(simm_len):
+            if simm_key[i]!=key[i]:
+                err=err+1
+        print("~Bob    # QBER="+str(err/simm_len))
+        if simm_key==key[0:simm_len]:
+            Bob.sendClassical("Alice", json.dumps("CHARLIE GOOD").encode("utf-8"))
+        else:
+            Bob.sendClassical("Alice", json.dumps("CHARLIE EVIL").encode("utf-8"))
+            print("~Bob    # BOB IS DESTROYING THE KEY")
+            key=None

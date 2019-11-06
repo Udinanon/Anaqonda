@@ -1,4 +1,4 @@
-simulaqron stop
+simulaqron reset
 simulaqron set max-qubits 65536
 simulaqron start
 
