@@ -49,6 +49,12 @@ with CQCConnection("Alice") as Alice:
             if matrix[i][1] == 0:
                 x_vector[i] = "b"
                 continue
+            if h_vector[i] != hother_vector[i]:
+                x_vector[i] = "h"
+                continue
+            if h_vector[i] == 1 and matrix[i][0] == 0:
+                continue
+            x_vector[i] = 1 if x_vector[i] == 0 else 0
 
     else:
         pass  # nothing to do
