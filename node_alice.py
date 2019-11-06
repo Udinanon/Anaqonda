@@ -94,6 +94,7 @@ with CQCConnection("Alice") as Alice:
             if simm_key[i]!=key[i]:
                 err=err+1
         print("~Alice  # QBER="+str(err/simm_len))
+        # Perfect channel, no errors
         if simm_key==key[0:simm_len]:
             Alice.sendClassical("Bob", json.dumps("CHARLIE GOOD").encode("utf-8"))
         else:
