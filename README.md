@@ -24,6 +24,7 @@ Node Alice/Bob operations
 7. Exchange the `h_vector` with the other node
 8. If the node is master it filters the `x_vector` in order to obtain the actual key(5)
 9. Otherwise it cleans the unusable bits from the `x_vector`(6)
+10. Create a `key` array and fill it with valid bits from `x_vector`(7)
 
 Notes
 ---------
@@ -69,4 +70,10 @@ if matrix[i][1] == 0:
 if h_vector[i] != hother_vector[i]:
     x_vector[i] = "h"
     continue
+```
+
+(7) key finalization:
+```python
+if type(x_vector[i]) is not str:
+    key.append(x_vector[i])
 ```
