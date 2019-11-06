@@ -176,4 +176,5 @@ class Node(object):
                 results.append({"msg": data["msg"], "status": False})
                 continue
             results.append({"msg": data["msg"], "status": True})
+        return results
         
