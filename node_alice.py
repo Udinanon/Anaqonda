@@ -1,6 +1,7 @@
 from cqc.pythonLib import CQCConnection, qubit
 import random
 import json
+import time
 
 N_QUBIT = 10
 
@@ -34,8 +35,13 @@ with CQCConnection("Alice") as Alice:
     # Receive the resulting matrix from Charlie
     matrix = json.loads(Alice.recvClassical().decode("utf-8"))
 
-    #TODO: send vector
-    hother_vector = [] #TODO: read vector
+    time.sleep(1)
+
+    # Send vector H
+    Alice.sendClassical("Bob", json.dumps(h_vector).encode("utf-8"))
+
+    # Read vector H
+    hother_vector = json.loads(Alice.recvClassical().decode("utf-8"))
 
     if im_master:
         # Flips the necessary bits based on matrix correlation
