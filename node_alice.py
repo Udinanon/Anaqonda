@@ -3,7 +3,7 @@ import random
 import json
 import time
 
-N_QUBIT = 10
+N_QUBIT = 100
 
 with CQCConnection("Alice") as Alice:
     # Preparing my qubits
@@ -57,8 +57,25 @@ with CQCConnection("Alice") as Alice:
             x_vector[i] = 1 if x_vector[i] == 0 else 0
 
     else:
-        pass  # nothing to do
+        # Remove errors
+        for i in range(N_QUBIT):
+            if matrix[i][1] == 0:
+                x_vector[i] = "b"
+                continue
+            if h_vector[i] != hother_vector[i]:
+                x_vector[i] = "h"
+                continue
     
+    # Filtering key
+    key = []
+    for i in range(N_QUBIT):
+        if type(x_vector[i]) is not str:
+            key.append(x_vector[i])
+
     # Print the key obtained
-    print(x_vector)
+    print(key)
+    print("Key length" + str(len(key)))
+
+    # TOremove
+    #Alice.sendClassical("Bob", json.dumps(x_vector).encode("utf-8"))
 

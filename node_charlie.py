@@ -2,7 +2,7 @@ from cqc.pythonLib import CQCConnection, qubit
 import random
 import json
 
-N_QUBIT = 10
+N_QUBIT = 100
 
 while True:
     with CQCConnection("Charlie") as Charlie:
