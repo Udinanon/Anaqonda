@@ -40,10 +40,13 @@ with CQCConnection("Bob") as Bob:
     if im_master:
         # Flips the necessary bits based on matrix correlation
         for i in range(N_QUBIT):
-            if matrix[i][0] == 0:
-                x_vector[i] = ''
+            if matrix[i][1] == 0:
+                x_vector[i] = "b"
                 continue
-            if (matrix[i][0] == 1) and (h_vector[i] == 1):
+            if h_vector[i] != hother_vector[i]:
+                x_vector[i] = "h"
+                continue
+            if h_vector[i] == 1 and matrix[i][0] == 0:
                 continue
             x_vector[i] = 1 if x_vector[i] == 0 else 0
     else:
