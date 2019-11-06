@@ -12,18 +12,21 @@ class Node(object):
         self.name = name
     
     def gen_key(self, partner, key_length, tag):
-        key = _gen_key(self, partner, int(key_length*7.5))
+        key = self._gen_key(partner, int(key_length*3.25))
+        print("1 of first done")
         while len(key) < key_length:
-            temp = _gen_key(self, partner, int(7.5*(key_length - len(key))))
+            temp = self._gen_key(partner, int(3.25*(key_length - len(key))))
             key.append(temp)
+            print("resize")
         # trim, save, return
         self.keys[partner][tag] = key[0:key_length]
         return
 
     def _gen_key(self, partner, N_QUBIT):
         with open("n_qubit.config", "w+") as config_file:
-            config_file.write(N_QUBIT)
+            config_file.write(str(N_QUBIT))
         with CQCConnection(self.name) as Me:
+            print("start prep qbit " + self.name)
             # Preparing my qubits
             h_vector = [random.choice([0, 1]) for _ in range (N_QUBIT)]
             x_vector = [random.choice([0, 1]) for _ in range (N_QUBIT)]
@@ -42,24 +45,33 @@ class Node(object):
             # if I am the master, stating who I am
             #print("~Alice  # Am I the master, stating who I am (?_?)")
             Me.sendClassical("Charlie", json.dumps( {"name": self.name} ).encode("utf-8"))
+            print("CIAONE " + self.name)
             charlie_attempt_response = Me.recvClassical()
             im_master = json.loads(charlie_attempt_response.decode("utf-8"))
-            
+            print(self.name + str(im_master))
+
             # If Charlie responded than it's ready for receiving my qubits, I send them
             #print("~Alice  # I'm sending the qubits to Charlie (T_T)")
-            for qubit in q_vector:
-                Me.sendQubit(qubit, "Charlie")
+            for qb in q_vector:
+                Me.sendQubit(qb, "Charlie")
+            print(self.name + " sent qubits")
             
             # Receive the resulting matrix from Charlie
             matrix = json.loads(Me.recvClassical().decode("utf-8"))
 
-            time.sleep(1)
+            time.sleep(0.1)
 
-            # Send vector H
-            Me.sendClassical(partner, json.dumps(h_vector).encode("utf-8"))
-
-            # Read vector H
-            hother_vector = json.loads(Me.recvClassical().decode("utf-8"))
+            if im_master:
+                # Send vector H
+                Me.sendClassical(partner, json.dumps(h_vector).encode("utf-8"))
+                # Read vector H
+                hother_vector = json.loads(Me.recvClassical().decode("utf-8"))
+            else:
+                # Read vector H
+                hother_vector = json.loads(Me.recvClassical().decode("utf-8"))
+                # Send vector H
+                Me.sendClassical(partner, json.dumps(h_vector).encode("utf-8"))
+            print(self.name + " h exchanged")
 
             if im_master:
                 # Flips the necessary bits based on matrix correlation
@@ -95,16 +107,18 @@ class Node(object):
             
             if not im_master:
                 simm_len = int(len(key)/3)
+                print(self.name + " send partial key")
                 Me.sendClassical(partner, json.dumps(key[0:simm_len]).encode("utf-8"))
+                print(self.name + " receive partial key")
                 charlie_evil_str = json.loads(Me.recvClassical().decode("utf-8"))
                 #print(charlie_evil_str)
                 if charlie_evil_str == "CHARLIE EVIL":
                     print("~" + self.name + "  # " + self.name + " IS DESTROYING THE KEY, CHARLIE IS EVIL")
                     key = None
-                else
+                else:
                     key = key[simm_len:]
-
             else:
+                print(self.name + " receive partial key")
                 simm_key = json.loads(Me.recvClassical().decode("utf-8"))
                 simm_len = len(simm_key)
                 #print("~Alice  # ARE SIMM_KEYS THE SAME? "+str(simm_key==key[0:simm_len]))
@@ -114,6 +128,7 @@ class Node(object):
                         err_counter = err_counter + 1
                 #print("~Alice  # QBER="+str(err_counter/simm_len))
                 # Suppose perfect channel, no errors
+                print(self.name + " send partial key")
                 if err_counter == 0:
                     Me.sendClassical(partner, json.dumps("CHARLIE GOOD").encode("utf-8"))
                     key = key[simm_len:]
@@ -121,6 +136,7 @@ class Node(object):
                     Me.sendClassical(partner, json.dumps("CHARLIE EVIL").encode("utf-8"))
                     print("~" + self.name + "  # " + self.name + " IS DESTROYING THE KEY, CHARLIE IS EVIL")
                     key = None
+            return key
     
     def send_key_part(self, to, key_with, key_tag, length, crypt):
         key = self.keys[key_with][key_tag]
@@ -159,12 +175,12 @@ class Node(object):
             for i in len(key_recv):
                 key_recv[i] ^= crypt[i]
             self.keys_others[data["key_with"]][data["key_tag"]] = key_recv
-        else if message_recv["type"] == "signed_message":
+        elif message_recv["type"] == "signed_message":
             data = message_recv["data"]
             data["from"] = message_recv["from"]
             self.unverified_message.append(data)
 
-    def verify_message(self, auth):
+    def verify_messages(self, auth):
         results = []
         while len(self.unverified_message) > 0:
             data = self.unverified_message.pop()

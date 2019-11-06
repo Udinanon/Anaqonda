@@ -1,44 +1,40 @@
-key_length=20
+import Node
 
-alice=Node("Alice")
-bob=Node("Bob")
-charlie=Charlie()
-david=Node("David")
+key_length=8
+
+alice = Node.Node("Alice")
+#bob = Node.Node("Bob")
+david = Node.Node("David")
+
+print("nodes created")
+
 #KGP
-alice.gen_key("bob", key_length, "0")
-alice.gen_key("bob", key_length, "1")
-alice.gen_key("david", key_length, "0")
-alice.gen_key("david", key_length, "1")
-david.gen_key("bob", key_length, "qkd")
+alice.gen_key("Bob", key_length, "0")
+print("first gen key done")
+alice.gen_key("Bob", key_length, "1")
+alice.gen_key("David", key_length, "0")
+alice.gen_key("David", key_length, "1")
+david.gen_key("Bob", key_length, "qkd")
+print("all k done")
+
 #key simm
-david.send_key_part("bob", david.keys["alice"]["0"], length=0.5, crypt=david.keys["bob"]["qkd"])
-bob.check_incoming("part david alice 0", crypt=bob.keys["david"]["qkd"])
-david.send_key_part("bob", david.keys["alice"]["1"], length=0.5, crypt=david.keys["bob"]["qkd"])
-bob.check_incoming("part david alice 1", crypt=bob.keys["david"]["qkd"])
-bob.send_key_part("david", david.keys["david"]["0"], length=0.5, crypt=bob.keys["david"]["qkd"])
-david.check_incoming("part bob alice 0", crypt=david.keys["bob"]["qkd"])
-bob.send_key_part("david", david.keys["david"]["1"], length=0.5, crypt=bob.keys["david"]["qkd"])
-david.check_incoming("part bob alice 1", crypt=david.keys["bob"]["qkd"])
+david.send_key_part("bob", "alice", "0", length=0.5, crypt=david.keys["bob"]["qkd"])
+bob.check_incoming(crypt=bob.keys["david"]["qkd"])
+david.send_key_part("bob", "alice", "1", length=0.5, crypt=david.keys["bob"]["qkd"])
+bob.check_incoming(crypt=bob.keys["david"]["qkd"])
 
-alice.send_data("bob", msg="1" +alice.keys["bob"]["1"]+alice.keys["david"]["1"])
-alice.send_data("david", msg="1 "+alice.keys["bob"]["1"]+alice.keys["david"]["1"])
+bob.send_key_part("david", "alice", "0", length=0.5, crypt=bob.keys["david"]["qkd"])
+david.check_incoming(crypt=david.keys["bob"]["qkd"])
+bob.send_key_part("david", "alice", "1", length=0.5, crypt=bob.keys["david"]["qkd"])
+david.check_incoming(crypt=david.keys["bob"]["qkd"])
 
-bob.receive_keys("alice")
-bob_result=bob.verify_keys()
+alice.send_data("bob", "1", "david")
+bob.check_incoming()
+alice.send_data("david", "1", "bob")
+david.check_incoming()
 
-if bob_result:
-    print("BOB VERIFIED THE KEYS")
-else:
-    print("BOB COULDN'T VERIFY THE KEYS")
-    raise 
+bob_result = bob.verify_messages()
+print(bob_result)
 
-david.receive_keys("alice")
-david_result=david.verify_keys()
-
-if david_result:
-    print("DAVID VERIFIED THE KEYS")
-else:
-    print("DAVID COULDN'T VERIFY THE KEYS")
-
-if bob_result and david_result:
-    print("THE PROCESS WAS SUCCESFUL")
+david_result = david.verify_messages()
+print(david_result)
